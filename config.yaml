@@ -1,0 +1,4 @@
+# Config for trainig parameter
+input_neuron : 3
+hidden_neuron : 10
+output_neuron : 3

@@ -4,6 +4,7 @@ import yaml
 
 # Local Import
 from utils.utils import AttrDict
+from utils.dataloader import IrisLoader
 from model import Model
 
 # Set device
@@ -24,6 +25,8 @@ if __name__ == "__main__":
     # Set to train mode
     model.train()
 
-    # Test tensor input
+    # Test tensor input (TODO: Remove this)
     input_tensor = torch.Tensor([0.1, 0.2, 0.3]).to(device)
     print(model.forward(input_tensor))
+    loader = IrisLoader("dataset_trainable/train.csv")
+    print(loader.__getitem__(10))

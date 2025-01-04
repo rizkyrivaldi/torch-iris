@@ -37,8 +37,19 @@ class IrisLoader(Dataset):
         data_row = self.train_df.iloc[idx].to_numpy()
 
         # Tensorize the input vector
-        raw_input_vector = data_row[:-2]
-        normalized_input_vector = list(raw_input_vector / 10.0)
+        raw_input_vector = data_row[:-1]
+
+        # Normalize each vector
+        normalized_input_vector = list(
+                [
+                    raw_input_vector[0] / 8.0,
+                    raw_input_vector[1] / 4.5,
+                    raw_input_vector[2] / 7.0,
+                    raw_input_vector[3] / 2.5
+                ]
+            )
+
+        # normalized_input_vector = list(raw_input_vector / 10.0)
         input_vector = torch.Tensor(normalized_input_vector).to(device)
 
         # Tensorize the output vector

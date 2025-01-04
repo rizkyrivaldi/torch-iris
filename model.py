@@ -12,6 +12,10 @@ class Model(torch.nn.Module):
             torch.nn.Tanh(),
             torch.nn.Linear(config.hidden_neuron, config.hidden_neuron),
             torch.nn.Tanh(),
+            torch.nn.Linear(config.hidden_neuron, config.hidden_neuron),
+            torch.nn.Tanh(),
+            torch.nn.Linear(config.hidden_neuron, config.hidden_neuron),
+            torch.nn.Tanh(),
             torch.nn.Linear(config.hidden_neuron, config.output_neuron),
             torch.nn.Tanh()
         )

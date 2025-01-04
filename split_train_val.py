@@ -26,7 +26,7 @@ class SplitTrainVal:
         df_valid = df.iloc[int(len(df)*self.split_ratio):]
         
         # For debug purpose, check max value for each column, for normalization
-        # print(df.max())
+        print(df.max())
 
         # Delete the output path directory if exist
         if os.path.exists(self.output_path):

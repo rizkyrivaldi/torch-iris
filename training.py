@@ -32,8 +32,8 @@ if __name__ == "__main__":
     optimizer = torch.optim.SGD(model.parameters(), lr = config.learning_rate, momentum = config.learning_momentum)
 
     # Set LR Scheduler
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size = config.lr_decay_epoch, gamma = config.lr_decay_gamma)
-    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max')
+    # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size = config.lr_decay_epoch, gamma = config.lr_decay_gamma)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
 
     # Set training and validation dataloader
     train_loader = DataLoader(IrisLoader("dataset_trainable/train.csv"), batch_size = config.batch_size, shuffle = True)
@@ -41,6 +41,9 @@ if __name__ == "__main__":
 
     # Set the model to train mode
     model.train()
+
+    # Set the max validation loss to infinite
+    max_validation_loss = np.inf
 
     # Do the training
     for epoch in range(config.max_epoch):
@@ -52,9 +55,6 @@ if __name__ == "__main__":
             # Feed Forward
             pred = model.forward(input_vectors)
 
-            # Reset optimizer gradient
-            optimizer.zero_grad()
-
             # Calculate the loss function and backpropagate
             loss = loss_function(pred, output_vectors)
             loss.backward()
@@ -64,17 +64,56 @@ if __name__ == "__main__":
  
             # Adjust learning weights
             optimizer.step()
+
+            # Reset optimizer gradient
+            optimizer.zero_grad()
+
+        # Calculate the training loss
+        training_loss = np.mean(temp_loss)
         
+        # Validate the model every specified epoch
+        if (epoch + 1) % config.validation_epoch == 0:
+            # Set the model to evaluation mode
+            model.eval()
+
+            ## Reset the temp loss
+            temp_loss = []
+            for input_vectors, output_vectors in valid_loader:
+                # Do a Feed Forward
+                pred = model.forward(input_vectors)
+                loss = loss_function(pred, output_vectors)
+
+                # Sum the loss
+                temp_loss.append(float(loss))
+
+            # Calculate the validation loss
+            validation_loss = np.mean(temp_loss)
+
+            # Step the plateau scheduler
+            scheduler.step(validation_loss)
+
+            print(f"Validation Loss: {validation_loss}")
+
+            # Save the model that has the nearest valid loss with the train loss
+            if validation_loss < max_validation_loss:
+                ## Set the max_validation_loss to the new value
+                max_validation_loss = validation_loss
+
+                ## Check if the directory is available, create one if not avaiable
+                if not os.path.exists(config.model_dir):
+                    os.makedirs(config.model_dir)
+
+                ## Save the best model
+                torch.save(model.state_dict(), f'{config.model_dir}best_weight.pth')
+                print("Best model has been saved")
+
+            # Set the model back to training mode
+            model.train()
+
         # Step the scheduler
-        scheduler.step()
+        # scheduler.step()
 
-        # Calculate the epoch loss
-        epoch_loss = np.mean(temp_loss)
-
-        # Step the scheduler
-        # scheduler.step(epoch_loss)
-
-        print(f"Epoch : {epoch}\t Loss : {epoch_loss}")
+        print(f"Epoch : {epoch}\t Loss : {training_loss}")
 
     # Save the model at the end of training
     ## Check if the directory is available, create one if not avaiable
@@ -82,8 +121,8 @@ if __name__ == "__main__":
         os.makedirs(config.model_dir)
 
     ## Save the model
-    torch.save(model.state_dict(), f'{config.model_dir}saved_model.pth')
-    print("Model Has Been Saved")
+    torch.save(model.state_dict(), f'{config.model_dir}final_weight.pth')
+    print("Final Weight Has Been Saved")
 
 # # create one test tensor from the testset
 # X_test, y_test = default_collate(testset)

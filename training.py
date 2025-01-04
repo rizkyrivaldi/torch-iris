@@ -3,6 +3,7 @@ import torch
 from torch.utils.data import DataLoader
 import yaml
 import numpy as np
+import os
 
 # Local Import
 from utils.utils import AttrDict
@@ -74,6 +75,15 @@ if __name__ == "__main__":
         # scheduler.step(epoch_loss)
 
         print(f"Epoch : {epoch}\t Loss : {epoch_loss}")
+
+    # Save the model at the end of training
+    ## Check if the directory is available, create one if not avaiable
+    if not os.path.exists(config.model_dir):
+        os.makedirs(config.model_dir)
+
+    ## Save the model
+    torch.save(model.state_dict(), f'{config.model_dir}saved_model.pth')
+    print("Model Has Been Saved")
 
 # # create one test tensor from the testset
 # X_test, y_test = default_collate(testset)

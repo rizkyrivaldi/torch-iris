@@ -1,5 +1,8 @@
+# Model Config
+model_dir : "./trained_model/"
+
 # Config for training
-max_epoch : 20000
+max_epoch : 20
 batch_size : 120
 learning_rate : 0.4321
 learning_momentum : 0.8

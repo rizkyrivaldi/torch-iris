@@ -24,7 +24,7 @@ if __name__ == "__main__":
         config = AttrDict(config_dict)
 
     # Get the dataloader
-    test_dataloader = IrisLoader("dataset/iris.csv")
+    test_dataloader = IrisLoader("dataset/Iris.csv")
 
     # Get the data decoder
     translator = DatasetTranslator(["Iris-setosa", "Iris-versicolor", "Iris-virginica"])
